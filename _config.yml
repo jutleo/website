@@ -14,12 +14,12 @@ menuitems:
 - name:     首页
   url:      /
   class:    leo-nav-item
-- name:     归档
-  url:      /category.html
+- name:     餐饮解决方案
+  url:      /
   class:    leo-nav-item
-- name:     豆豆
-  url:      /andy.html
+- name:     酒店解决方案
+  url:      /
   class:    leo-nav-item
-- name:     联系我
+- name:     联系我们
   url:      /contant.html
   class:    leo-nav-item last

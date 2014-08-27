@@ -3,14 +3,25 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>{{ page.title }}</title>
+        <title></title>
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="/static/css/leo.css">
     </head>
     <body>
       <div class="leo-head">
-        {% include head.html %}
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">餐饮解决方案</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">酒店解决方案</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我们</a></li>
+  
+</ul>
+
       </div>
           </div>
       <div class="container-fluid">
@@ -74,7 +85,9 @@
         </div>
         
       <div class="leo-foot">
-        {% include foot.html %}
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
       </div>
     </body>
 </html>
