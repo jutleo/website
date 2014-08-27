@@ -20,6 +20,15 @@ menuitems:
 - name:     酒店解决方案
   url:      /
   class:    leo-nav-item
+- name:     中小零售咨询服务
+  url:      /consult.html
+  class:    leo-nav-item
+- name:     硬件产品
+  url:      /consult.html
+  class:    leo-nav-item
+- name:     工理百科
+  url:      /consult.html
+  class:    leo-nav-item
 - name:     联系我们
   url:      /contant.html
   class:    leo-nav-item last
