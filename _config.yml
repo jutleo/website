@@ -30,5 +30,5 @@ menuitems:
   url:      /website
   class:    leo-nav-item
 - name:     联系我们
-  url:      /contant.html
+  url:      /website/contant.html
   class:    leo-nav-item last
