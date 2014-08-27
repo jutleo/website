@@ -12,22 +12,22 @@ author:
   email: jutleo@gmail.com
 menuitems:
 - name:     首页
-  url:      /
+  url:      /website
   class:    leo-nav-item
 - name:     餐饮解决方案
-  url:      /
+  url:      /website
   class:    leo-nav-item
 - name:     酒店解决方案
-  url:      /
+  url:      /website
   class:    leo-nav-item
 - name:     中小零售咨询服务
-  url:      /consult.html
+  url:      /website
   class:    leo-nav-item
 - name:     硬件产品
-  url:      /consult.html
+  url:      /website
   class:    leo-nav-item
 - name:     工理百科
-  url:      /consult.html
+  url:      /website
   class:    leo-nav-item
 - name:     联系我们
   url:      /contant.html
