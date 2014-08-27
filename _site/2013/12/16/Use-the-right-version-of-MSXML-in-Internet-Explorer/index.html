@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>如何在IE浏览器中正确的使用MSXML 版本</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">如何在IE浏览器中正确的使用MSXML 版本</h1>
+<div class="post">
+<h2>引言</h2>
+
+<p>&emsp;V6系统这几年来一直提示XML解析器版本低，请升级，默认就下载系统提供的XML4.0版本，装来装去貌似能解决一部分问题，终归无法根本解决。由于要拿部分系统去演示，在虚拟机里配置时遇到问题了，我自己的主机是IE11的版本，无法正常访问系统，问题出来了，自己不能不解决啊。</p>
+
+<h2>资料收集</h2>
+
+<p>&emsp;这是来自Microsoft XML Tream   Blog的一篇文章
+<a href="http://blogs.msdn.com/b/xmlteam/archive/2006/10/23/using-the-right-version-of-msxml-in-internet-explorer.aspx">Using the right version of MSXML in Internet Explorer</a>，文章说的很明确，针对性MSXML6 （最新的）和MSXML3 （部署最广泛的）版本的MSXML ，做了最大的优化和调整，并且用于浏览器内置。并且此blog里给出了最佳实践：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">var progIDs = [ &#39;Msxml2.DOMDocument.6.0&#39;, &#39;Msxml2.DOMDocument.3.0&#39;];
+for (var i = 0; i &lt; progIDs.length; i++) {
+    try {
+                var xmlDOM = new ActiveXObject(progIDs[i]);
+            return xmlDOM;
+        }
+    catch (ex) {
+
+        }
+}
+return null;
+</code></pre></div>
+<p>&emsp;回过头来看看系统中如何使用的：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">function getXMLActiveObj(){
+    try{
+        return new ActiveXObject(&quot;MSXML2.DOMDocument.4.0&quot;);
+    }catch(e){
+        if(confirm(&quot;您的机器上的XML解析器版本太低，您是否打算现在升级？&quot;)){
+            document.location = global.WEB_APP_NAME + &quot;/core/jsp/common/MsXML4.0.jsp&quot;;
+        }
+        return null;
+    }
+}
+</code></pre></div>
+<p>&emsp;来看看MSXML4.0.jsp页面中是如何加载的：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&lt;object id=&quot;MSXML4&quot;
+classid=&quot;clsid:88d969c0-f192-11d4-a65f-0040963251e5&quot;
+codebase=&quot;MsXML4.0.cab#version=4,00,9004,0&quot;
+type=&quot;application/x-oleobject&quot;
+STYLE=&quot;display: none&quot;&gt;
+&lt;/object&gt;
+</code></pre></div>
+<p>&emsp;貌似最开始的加载就是建立在一种假设的基础上，导致后来操作系统、浏览器升级带来问题。</p>
+
+<h2>调整<code>getXMLActiveObj</code>方法解决问题？</h2>
+
+<p>&emsp;引用官方的例子，重新调整<code>getXMLActiveObj</code>方法</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">function getXMLActiveObj(){
+    var progIDs = [&#39;MSXML2.DOMDocument.6.0&#39;,&#39;MSXML2.DOMDocument.4.0&#39;,&#39;MSXML2.DOMDocument.3.0&#39;];
+    for (var i = 0; i &lt; progIDs.length; i++) {
+        try {
+            var xmlDOM = new ActiveXObject(progIDs[i]);
+            return xmlDOM;
+        }
+        catch (ex) {
+        }
+    }
+}
+</code></pre></div>
+<p>&emsp;由于我们最初使用的4.0版本，而且系统提供4.0版本的默认安装，还是保留4.0吧（官方貌似推荐3.0版本）。这样按照官方的解释，总是能获取到一个正确版本<code>ActiveXObject</code>对象。</p>
+
+<h2>是否解决问题？</h2>
+
+<p>&emsp;系统可以在IE11下正常访问了，不用关注插件版本问题，而且插件默认总是能获取到。其实内置的也不算插件吧！</p>
+
+<h2>遗留问题</h2>
+
+<p>&emsp;按照官方的解释 MSXML6.0 在XP中已经被系统支持，而且性能较优，版本低的还是由实施项目组自行决定是否升级吧！</p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年12月16日
+  <br>
+  原文：
+  <a href="/2013/12/16/Use-the-right-version-of-MSXML-in-Internet-Explorer">如何在IE浏览器中正确的使用MSXML 版本</a>
+  <br>
+  标签： MSXML
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

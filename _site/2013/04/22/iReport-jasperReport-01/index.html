@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>iReport+jasperReport概念的澄清</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">iReport+jasperReport概念的澄清</h1>
+<div class="post">
+<h3>基本概念</h3>
+
+<p>从<a href="http://jasperforge.org/">这个网址</a>就可以得到ireport+jasperReport，注意下载iReport和jasperReport的版本必须一致。<br>
+我们所说的报表指的是JasperReport，iReport只是jasperReport的一个可视化的开发工具，JasperReport通过读取xml文件生成报表，分为三个部分：<br>
+1. 编写xml文件也就是jrxml文件;<br>
+2. 读取并编译jrxml---&gt;jasper文件;<br>
+3. 填充报表;  </p>
+
+<p>而iReport只是帮我们完成了一个可视化的编写jrxml文件，之后在我后面的文章中还会看到直接使用jasperReport的JasperDesign设计器也可以构造出一个没有jrxml文件的复杂报表。
+当然iReport这个工具还给我们提供了不少优秀的功能，编译、预览、复杂报表的设计。  </p>
+
+<h3>基本设置</h3>
+
+<p>打开iReport的“Options” -“ 选项“--&quot;General&quot;,默认的中文好像并不是我们想象的那样好看，建议使用english。
+&quot;Compiler&quot;标签的Default Compilation Directory 设置一个你自己的路径，也可以不设置，
+这个主要是存放编译好的jasper文件的路径的，笔者不太喜欢文件的乱存放。&quot;External Programs&quot; 选择使用什么样的程序浏览报表，
+默认是使用iReport自身的JRViewer Previwer预览的，我们可以指定自己的pdf，html等其它的预览工具。</p>
+
+<h3>数据源设置</h3>
+
+<p>将数据库使用的jdbc驱动包复制到iReport安装路径的lib文件夹下，新建一个connections/DataSource<br>
+<img src="/static/img/20130422001.jpg" alt="数据源设置"><br>
+JaspreReport支持很多中数据源之后在详细介绍每一种数据源的使用<br>
+<img src="/static/img/20130422002.jpg" alt="数据源设置">  </p>
+
+<h3>PDF报表的中文处理</h3>
+
+<p>jasperreport支持中文依赖iText.jar，报表设计时将字体设计为：<br>
+<img src="/static/img/20130422003.png" alt="数据源设置"><br>
+网上找一些这方面的资料很容易就可以利用报表向导做一个简单的报表，
+<a href="http://www.blogjava.net/fastunit/archive/2008/01/16/175687.html">这位哥们</a>写的就很不错，截图都有了
+<a href="http://jasperreports.sourceforge.net/api/index.html">jasperReport API</a>这是jasperReport的api地址，大家可以利用它的源码自己生成api。 </p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年04月22日
+  <br>
+  原文：
+  <a href="/2013/04/22/iReport-jasperReport-01">iReport+jasperReport概念的澄清</a>
+  <br>
+  标签： iReport、jasperReport
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

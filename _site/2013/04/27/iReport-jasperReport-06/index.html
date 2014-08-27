@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>iReport+jasperReport之CSV、XML数据源</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">iReport+jasperReport之CSV、XML数据源</h1>
+<div class="post">
+<p>jasperReport支持多种格式的数据源，CSV(Comma Separated values),是一种用来存储数据的纯文本,文件格式，通常用于电子表格或数据库软件。  </p>
+
+<p><strong>规则</strong>  </p>
+
+<ol>
+<li>开头是不留空，以行为单位。<br></li>
+<li>可含或不含列名，含列名则居文件第一行。<br></li>
+<li>一行数据不垮行，无空行。<br></li>
+<li>以半角符号，作分隔符，列为空也要表达其存在。<br></li>
+<li>列内容如存在，，则用“”包含起来。<br></li>
+<li>列内容如存在“”则用“”“”包含。<br></li>
+<li>文件读写时引号，逗号操作规则互逆。<br></li>
+<li>内码格式不限，可为ASCII、Unicode或者其他。<br></li>
+</ol>
+
+<p>jasper文件和前面几篇用到的是一样的(person.jasper),准备数据的文本文件Person.txt其中文件的格式对应模板文件的字段【 &quot;pid&quot;, &quot;name&quot;, &quot;sex&quot;, &quot;age&quot;, &quot;password&quot;, &quot;department&quot;】。  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&quot;20000000001&quot;,&quot;bulktree1&quot;,&quot;man&quot;,&quot;21&quot;,&quot;1111111111&quot;,&quot;pcisv61&quot;
+&quot;20000000002&quot;,&quot;bulktree2&quot;,&quot;man&quot;,&quot;22&quot;,&quot;2222222222&quot;,&quot;pcisv62&quot;
+&quot;20000000003&quot;,&quot;bulktree3&quot;,&quot;man&quot;,&quot;23&quot;,&quot;3333333333&quot;,&quot;pcisv63&quot;
+&quot;20000000004&quot;,&quot;bulktree4&quot;,&quot;man&quot;,&quot;24&quot;,&quot;4444444444&quot;,&quot;pcisv64&quot;
+&quot;20000000005&quot;,&quot;bulktree5&quot;,&quot;man&quot;,&quot;25&quot;,&quot;5555555555&quot;,&quot;pcisv65&quot;
+&quot;20000000006&quot;,&quot;bulktree6&quot;,&quot;man&quot;,&quot;26&quot;,&quot;6666666666&quot;,&quot;pcisv66&quot;
+&quot;20000000007&quot;,&quot;bulktree7&quot;,&quot;man&quot;,&quot;27&quot;,&quot;7777777777&quot;,&quot;pcisv67&quot;
+&quot;20000000008&quot;,&quot;bulktree8&quot;,&quot;man&quot;,&quot;28&quot;,&quot;8888888888&quot;,&quot;pcisv68&quot;
+&quot;20000000009&quot;,&quot;bulktree9&quot;,&quot;man&quot;,&quot;29&quot;,&quot;9999999999&quot;,&quot;pcisv69&quot;
+</code></pre></div>
+<p>下来我们看看jasperReport的API是怎么识别这些数据的，但是做这个之前我们还要指定数据到底是怎么对应的,定义String类型数组存放模板对应的列名和文本数据对应  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">String[] columNames = new String[] { &quot;pid&quot;, &quot;name&quot;, &quot;sex&quot;, &quot;age&quot;, &quot;password&quot;,
+            &quot;department&quot; };
+</code></pre></div>
+<p>识别这些数据并不难，下面这一句就可以搞定：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">JRCsvDataSource jrcsvDataScource = new JRCsvDataSource(JRLoader
+            .getLocationInputStream(&quot;D:\\workspace\\Person.txt&quot;));
+</code></pre></div>
+<p>我们怎么才能让它识别对应的列呢？查看API看看对应的set方法吧！  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">// set record delimiter
+    jrcsvDataScource.setRecordDelimiter(&quot;\r\n&quot;);
+    // set columnName
+    jrcsvDataScource.setColumnNames(columNames);
+</code></pre></div>
+<p>至此数据源就准备完了，jasperReport封装了底层的实现，简单吧！下来看看完整的代码：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">package org.bulktree.ireport.csvdata;
+
+import java.util.HashMap;
+
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRCsvDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+
+import org.bulktree.ireport.ViewReport;
+
+public class CSVDataSource {
+
+    public static void main(String[] args) {
+        try {
+            new CSVDataSource().reportView();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void reportView() throws Exception {
+        JasperReport jasperReport = (JasperReport) JRLoader
+                .loadObject(&quot;D:\\workspace\\Person.jasper&quot;);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,
+                getReportParameter(), getDateSource());
+
+        new ViewReport().viewer(jasperPrint);
+    }
+
+    private HashMap getReportParameter() {
+        HashMap parameters = new HashMap();
+        parameters.put(&quot;reportTitle&quot;, &quot;laoshulin&quot;);
+        return parameters;
+    }
+
+    private JRCsvDataSource getDateSource() throws Exception {
+        String[] columNames = new String[] { &quot;pid&quot;, &quot;name&quot;, &quot;sex&quot;, &quot;age&quot;, &quot;password&quot;,
+                &quot;department&quot; };
+        // get csvdata
+        JRCsvDataSource jrcsvDataScource = new JRCsvDataSource(JRLoader
+                .getLocationInputStream(&quot;D:\\workspace\\test\\src\\org\\bulktree\\ireport\\csvdata\\Person.txt&quot;));
+        // set record delimiter
+        jrcsvDataScource.setRecordDelimiter(&quot;\r\n&quot;);
+        // set columnName
+        jrcsvDataScource.setColumnNames(columNames);
+
+        return jrcsvDataScource;
+    }
+}
+</code></pre></div>
+<p>还是这样的效果吧！^_^<br>
+<img src="/static/img/20130427001.jpg" alt="显示效果">  </p>
+
+<p>至于XML数据源也是很简单，通过读取xml文件获得数据  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Document document = JRXmlUtils.parse(JRLoader.getLocationInputStream(xmlFileName));
+</code></pre></div>
+<p>不同的是document会作为一个参数传递给报表，fillReport方法就不会出现第三个参数，完整代码如下：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">package org.bulktree.ireport.xmldata;
+
+import java.util.HashMap;
+import java.util.Locale;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.query.JRXPathQueryExecuterFactory;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.util.JRXmlUtils;
+
+import org.bulktree.ireport.ViewReport;
+import org.w3c.dom.Document;
+
+public class XMLDataSource {
+
+    private static final String JASPER_FILE_NAME = &quot;D:\\workspace\\Person.jasper&quot;;
+    private static final String XML_FILE_NAME = &quot;D:\\workspace\\person.xml&quot;;
+
+    private void viewerReport() throws JRException {
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(JASPER_FILE_NAME);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,
+                getReportParameter(XML_FILE_NAME));
+
+        new ViewReport().viewer(jasperPrint);
+    }
+
+    private HashMap getReportParameter(String xmlFileName) {
+        HashMap parameters = new HashMap();
+        try {
+            parameters.put(&quot;reportTitle&quot;, &quot;laoshulin&quot;);
+            Document document = JRXmlUtils.parse(JRLoader.getLocationInputStream(xmlFileName));
+
+            parameters.put(JRXPathQueryExecuterFactory.PARAMETER_XML_DATA_DOCUMENT,
+                    document);
+            parameters.put(JRXPathQueryExecuterFactory.XML_DATE_PATTERN, &quot;yyyy-MM-dd&quot;);
+            parameters.put(JRXPathQueryExecuterFactory.XML_NUMBER_PATTERN, &quot;#,##0.##&quot;);
+            parameters.put(JRXPathQueryExecuterFactory.XML_LOCALE, Locale.CHINESE);
+            parameters.put(JRParameter.REPORT_LOCALE, Locale.CHINA);
+
+        } catch (JRException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return parameters;
+    }
+
+    public static void main(String[] args) throws Exception {
+        new XMLDataSource().viewerReport();
+    }
+}
+</code></pre></div>
+<p>预览效果就不看了吧！哈哈 都是一样的道理，现在看看jasperReport的API有多强大了吧！  </p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年04月27日
+  <br>
+  原文：
+  <a href="/2013/04/27/iReport-jasperReport-06">iReport+jasperReport之CSV、XML数据源</a>
+  <br>
+  标签： iReport、jasperReport
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

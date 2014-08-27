@@ -1,0 +1,19 @@
+---
+layout: default
+---
+
+{% for post in site.posts %}
+   {% unless post.next %}
+     <h1 class="leo-category-title">{{ post.date | date: '%Y年' }}</h1>
+   {% else %}
+     {% capture year %}{{ post.date | date: '%Y' }}{% endcapture %}
+     {% capture nyear %}{{ post.next.date | date: '%Y' }}{% endcapture %}
+     {% if year != nyear %}
+       <h1 class="leo-category-title">{{ post.date | date: '%Y' }}</h1>
+     {% endif %}
+   {% endunless %}
+   <div class="leo-article">
+       <span class="leo-datetime">{{ post.date | date:"%m-%d" }} </span> - -  
+       <a href="{{ post.url }}">{{ post.title }}</a>
+   </div>
+{% endfor %}

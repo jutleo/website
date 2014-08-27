@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>iReport+jasperReport之i18n国际化支持</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">iReport+jasperReport之i18n国际化支持</h1>
+<div class="post">
+<p>新建一空白报表，还是和以前一致 添加reportTitle参数，添加一个图片控件、几个textField控件用来显示国际化内容：  </p>
+
+<p><img src="/static/img/20130507004.jpg" alt="显示效果"><br>
+选择report propertys 对话框</p>
+
+<p><img src="/static/img/20130507005.jpg" alt="显示效果">  </p>
+
+<p>这个一看就明白了，资源文件名字为I18nReportDemo，只要classPath可以找到就可以了；资源文件大致内容如下：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text"># Locale i18n_zh_CN for report I18nReportDemo.jrxml
+text.section1=\u8fd9\u662fIreport+JasperReport i18n\u7684\u4e00\u4e2ademo
+text.section2=\u56fd\u9645\u5316\u662f\u4e2a\u4ec0\u4e48\u73a9\u610f\u561b
+text.section3=Struts2-jasperReport-plugin.jar\u4e0d\u77e5\u9053\u662f\u4e0d\u662f\u8fd9\u6837\u7684bug\uff0c\u4f46\u662f\u6211\u4fee\u6539\u540e\u5c31\u53ef\u4ee5\u4f7f\u7528\u4e86
+image.url=eg_smile.gif
+text.showInfor=\u56fd\u9645\u5316\u6211\u89c9\u5f97\u9700\u6c42\u4e0d\u5927\uff0c\u4e0d\u8fc7\u597d\u50cf\u7ed3\u5408scriptlet\u4f7f\u7528\u53ef\u4ee5\u4f7fJasperReport\u7684\u529f\u80fd\u66f4\u52a0\u5f3a\u5927
+text.contributors=Author-bulktree,\nLAOSHULIN,\nwww.blogjava.net/bulktree  
+</code></pre></div>
+<p>有一点很重要，iReport使用$R{key}符号引用资源文件对应的key，前面提到的图片控件已用图片也可以使用这种方式简单的引用，资源文件可以使用\n换行。<br>
+** 还是那几行通用的代码：**  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">JasperReport jasperReport = JasperCompileManager.compileReport(path);
+    HashMap parameters = new HashMap();
+    parameters.put(&quot;ReportTitle&quot;, &quot;LAOSHULIN&quot;);
+    JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, new JREmptyDataSource());
+    JasperViewer jv = new JasperViewer(jasperPrint);
+    jv.setVisible(true);
+</code></pre></div>
+<p><img src="/static/img/20130507006.jpg" alt="显示效果"> </p>
+
+<p>iReport 给我们提供了很多的便利，只要发掘你会有意想不到的收获。  </p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年05月07日
+  <br>
+  原文：
+  <a href="/2013/05/07/iReport-jasperReport-12">iReport+jasperReport之i18n国际化支持</a>
+  <br>
+  标签： iReport、jasperReport
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

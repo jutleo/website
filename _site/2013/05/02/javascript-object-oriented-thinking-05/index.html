@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>javascript 对象化的思考再议 -- 全局导入导出</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">javascript 对象化的思考再议 -- 全局导入导出</h1>
+<div class="post">
+<h3>javascript 面向对象的编程</h3>
+
+<p>还是那句话：<strong>学习javascript 要学习它的精髓， 面向对象的javascript！</strong>  </p>
+
+<p><strong>全局导入</strong>     </p>
+
+<p>匿名自执行函数内部的变量都是局部变量，在全局的命名空间里是无法访问到局部变量的。但是在匿名函数内部却是可以使用
+全局变量的，而且很容易的操作它们。这个时候就会显得很复杂，尤其是匿名函数多的时候。    </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">var name = &#39;jutleo_01&#39;;
+(function(){
+    name = &#39;jutleo_02&#39;;
+})();
+alert(name); //jutleo_02
+</code></pre></div>
+<p>这样做完全没有问题，但是js解释器会遍历作用域链，让程序变的更慢。改进一下看看：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">var name = &#39;jutleo_01&#39;;
+
+(function(_name){
+    name = _name;
+})(&#39;jutleo_02&#39;);
+alert(name); //jutleo_02  
+</code></pre></div>
+<p>js解释器在局部变量的反应上会读取的更快、更高效！  </p>
+
+<p>这种例子很多，尤其是各大类库里经常会看到， 看看jQuery是如何做的？  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">(function($){
+    //to do some thing
+})(jQuery);
+</code></pre></div>
+<p>将jQuery对象传递进匿名函数内部作为局部变量<code>$</code>使用，不易产生冲突、简洁、高效。  </p>
+
+<p><strong>全局导出</strong>  </p>
+
+<p>上面一步步的引入全局导入。全局导出也是类似的原理， 导出和导入是相对的，举一个相对常见的例子来说明什么是全局导出吧：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">(function(exports){
+    exports.getName = function(){
+        return &#39;jutleo&#39;;
+    };
+})(window);
+</code></pre></div>
+<p>将全局的window对象导入匿名函数内部，使用变量名exports暴露全局变量。其实就是将getName方法优雅的暴露出去，代码整洁易懂！   </p>
+
+<p>全局导入、全局导出就这么点原理，一般我们写自己的类库、模块时经常会用到。 提到模块（封装逻辑、避免命名污染），其实匿名自执行就是一个模块原型。
+这也是我推荐的一种写法，可以很好的将自己的逻辑封装在匿名自执行函数内部，通过全局导入、导出的方式暴露给外部使用。  </p>
+
+<p>以下改口叫模块了。<br>
+在实际中，模块中的上下文(<code>this</code>)是怎样的呢？  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">(function(){
+    alert(this);
+})();
+</code></pre></div>
+<p>这里的<code>this</code>其实就是window对象，也就是说模块中的上下文都是全局的，this指向的是window对象。一不小心就创建了全局变量了。<br>
+那我们如何定义我们自己的作用域的上下文呢？  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">(function(){
+    var person = {};
+
+    person.getName = function(){
+        alert(this);
+        return &#39;jutleo&#39;;
+    };
+
+    person.getName();
+})();
+</code></pre></div>
+<p>此时的<code>this</code>指向了person对象，使用this就不会担心创建全局变量了。  </p>
+
+<p>javascript中的this和java中的this是不一样的，javascript中的this总是指向调用方，而java中的this总是指向当前对象！ 如果你还不了解，google吧,
+不在此做详细解释。</p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年05月02日
+  <br>
+  原文：
+  <a href="/2013/05/02/javascript-object-oriented-thinking-05">javascript 对象化的思考再议 -- 全局导入导出</a>
+  <br>
+  标签： javascript
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

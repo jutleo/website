@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>iReport+jasperReport之客户端打印 (续二) ----数字签名</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">iReport+jasperReport之客户端打印 (续二) ----数字签名</h1>
+<div class="post">
+<p>接着上篇，Java沙箱是运行Java小应用程序的一个软件单元。对Java小应用程序的访问权限加以限制，防止它访问计算机的关键部分。
+如磁盘驱动器、网络套接口和内存区等。jDK的 security API 提供对小应用程序进行数字签名来达到和application 一样的安全。<br>
+客户端打印采用applet会访问打印机，数字签名就成了必须，下面我们来看看如何制作数字签名：  </p>
+
+<p><strong><code>JDK</code>的<code>keytool</code>命令是安全钥匙和证书的管理工具，我们常用的命令如下：</strong>
+    -genkey      产生密钥文件,文件中包含用户的公钥、私钥和证书
+    -alias          产生别名
+    -keystore    指定密钥仓库名称
+    -validity      指定创建的证书有效期多少天
+    -storepass   指定密钥库的密码
+    -dname       指定证书拥有者信息 例如：  &quot;CN=sagely,OU=atr,O=szu,L=sz,ST=gd,C=cn&quot;
+    -list            列出系统证书仓库中存在证书名称列表
+    -export      将别名指定的证书导出到文件  keytool -export -alias caroot -file caroot.crt
+    -file           参数指定导出到文件的文件名
+    -delete       删除系统证书库的证书
+    -import      导入证书到密钥仓库   </p>
+
+<p>以下是生成客户端证书、并对jasperreports-3.0.1-applet.jar  包做签名的命令：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">keytool -genkey -validity 1800 -keystore applet.store -alias applet   
+keytool -export -keystore applet.store -alias applet -file applet.cer
+jarsigner -keystore applet.store jasperreports-3.0.1-applet.jar  applet  
+</code></pre></div>
+<p>根据提示输入相关信息及密码即可完成签名的制作。此时applet在第一次访问时浏览器会提示签名信息，至此整个客户端可以安全的访问了。
+时间仓卒，介绍的不是很详细 关于<code>keytool</code>工具的时候网上有很多，也比较详细，本文仅是对客户端applet打印的一点补充。</p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年05月08日
+  <br>
+  原文：
+  <a href="/2013/05/08/iReport-jasperReport-15">iReport+jasperReport之客户端打印 (续二) ----数字签名</a>
+  <br>
+  标签： iReport、jasperReport
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

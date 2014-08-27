@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>iReport+jasperReport之BEAN数据源</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">iReport+jasperReport之BEAN数据源</h1>
+<div class="post">
+<p>JasperFillManager.fillReport()这个方法在使用<a href="http://jutleo.github.io/2013/04/22/iReport-jasperReport-03/">JDBC数据源</a>时采用一个打开的数据库连接(getConn),除此之外jasperReport给我们提供了一个JRDataSource接口，
+用以实现我们自己的数据源JRDataSource接口只有两个方法：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">public interface JRDataSource
+{
+    /**
+     * 针对当前的数据源返回游标指向的下一个元素的值，
+     * 
+     */
+    public boolean next() throws JRException;
+   /**
+     * 返回游标指向的当前值
+     * 
+     */
+    public Object getFieldValue(JRField jrField) throws JRException;
+}
+</code></pre></div>
+<p><strong>JRBeanCollectionDataSource</strong><br>
+此种方式是最简单的一种，查看API我们就可以发现，JRBeanCollectionDataSource继承JRAbstractBeanDataSource类，
+而JRAbstractBeanDataSource是一个抽象类它间接的实现了JRDataSource这个接口，所以我们就可以不用自己去实现next()/getFieldValue()这两个方法了。<br>
+  看到JRBeanCollectionDataSource这个类名大概就知道怎么用了吧！<br>
+  我们的模板文件还是上篇的JDBC数据源的模板，只是没有了查询语句，手工建立所需的几个字段(域)  </p>
+
+<p>新建一vo对象Person.java，最基本的getter、setter方法  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">package org.bulktree.ireport.customdata;
+
+/**
+ * custom data
+ * 
+ * @author jutleo Email: jutleo@gmail.com @ Nov 7, 2008
+ */
+public class Person {
+    private String pid;
+    private String name;
+    private String sex;
+    private String age;
+    private String password;
+    private String department;
+
+    public Person(String pid, String name, String sex, String age, String password,
+            String department) {
+        this.pid = pid;
+        this.name = name;
+        this.sex = sex;
+        this.age = age;
+        this.password = password;
+        this.department = department;
+    }
+
+    public Person() {
+
+    }
+}
+</code></pre></div>
+<p>下来准备数据  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">Person p1 = new Person();
+p1.setAge(&quot;23&quot;);
+p1.setDepartment(&quot;ISoftStone&quot;);
+p1.setName(&quot;LAOSHULIN&quot;);
+p1.setPassword(&quot;123456789&quot;);
+p1.setPid(&quot;2008040516058772hj&quot;);
+p1.setSex(&quot;man&quot;);
+</code></pre></div>
+<p>既然它是一个BeanCollection我们 就来一个从conllection吧！  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">List&lt;Person&gt; list = new ArrayList&lt;Person&gt;();
+list.add(p1);
+</code></pre></div>
+<p>查看API，JRBeanCollectionDataSource的构造函数  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">public JRBeanCollectionDataSource(Collection beanCollection)
+{
+    this(beanCollection, true);
+}
+/**
+ *
+ */
+public JRBeanCollectionDataSource(Collection beanCollection, boolean isUseFieldDescription)
+{
+    super(isUseFieldDescription);
+
+    this.data = beanCollection;
+
+    if (this.data != null)
+    {
+        this.iterator = this.data.iterator();
+    }
+}
+</code></pre></div>
+<p>看看描述我们使用第一个  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">JRDataSource datesource = new JRBeanCollectionDataSource(list);
+</code></pre></div>
+<p>这个数据源就构造完毕了，很简单吧！这样报表就可以预览了，完整的代码如下：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">package org.bulktree.ireport.customdata;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JRViewer;
+import net.sf.jasperreports.view.JasperViewer;
+
+public class JasperReportDemo {
+    public static void main(String[] args) throws Exception {
+        JasperReportDemo jrd = new JasperReportDemo();
+        jrd.reportMethod(jrd.getMap());
+    }
+
+    public void reportMethod(Map map) throws Exception {
+        JasperReport jasperReport = null;
+        JasperPrint jasperPrint = null;
+
+        try {
+            /*
+             * File file = new File(&quot;Person.jrxml&quot;); InputStream in = new
+             * FileInputStream(file); // 编译报表 jasperReport =
+             * JasperCompileManager.compileReport(in);
+             */
+            // 实际中编译报表很耗时,采用Ireport编译好的报表
+            jasperReport = (JasperReport) JRLoader
+                    .loadObject(&quot;D:\\workspace\\Person.jasper&quot;);
+            // 填充报表
+            jasperPrint = JasperFillManager
+                    .fillReport(jasperReport, map, getDataSource());
+            // JasperExportManager.exportReportToHtmlFile(jasperPrint,
+            // &quot;test.html&quot;);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            jasperViewer.setVisible(true);
+        } catch (JRException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map getMap() {
+
+        Map map = new HashMap();
+        map.put(&quot;reportTitle&quot;, &quot;laoshulin&quot;);
+        return map;
+    }
+
+    public JRDataSource getDataSource() throws Exception {
+
+        // 自定义数据源
+        Person p1 = new Person();
+        p1.setAge(&quot;23&quot;);
+        p1.setDepartment(&quot;ISoftStone&quot;);
+        p1.setName(&quot;LAOSHULIN&quot;);
+        p1.setPassword(&quot;123456789&quot;);
+        p1.setPid(&quot;2008040516058772hj&quot;);
+        p1.setSex(&quot;man&quot;);
+        List&lt;Person&gt; list = new ArrayList&lt;Person&gt;();
+        list.add(p1);
+
+        JRDataSource datesource = new JRBeanCollectionDataSource(list);
+
+        return datesource;
+    }
+}
+</code></pre></div>
+<p><img src="/static/img/20130426001.jpg" alt="显示效果">   </p>
+
+<p>看看效果吧！<br>
+简简单单的几行代码就可以完成一个简单的报表，我们看到的这些工具栏图表还有窗口的一些标题啊等等都可以自己的定制哦，下来慢慢介绍！  </p>
+
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年04月26日
+  <br>
+  原文：
+  <a href="/2013/04/26/iReport-jasperReport-04">iReport+jasperReport之BEAN数据源</a>
+  <br>
+  标签： iReport、jasperReport
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

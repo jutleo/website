@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>apache负载均衡</title>
+        <meta name="viewport" content="width=device-width">
+        <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/leo.css">
+        <link rel="stylesheet" href="/static/css/prettify.css">
+
+    </head>
+    <body>
+      <div class="leo-head">
+        <ul class="leo-nav">
+  
+    <li><a class="leo-nav-item" href="/">首页</a></li>
+  
+    <li><a class="leo-nav-item" href="/category.html">归档</a></li>
+  
+    <li><a class="leo-nav-item" href="/andy.html">豆豆</a></li>
+  
+    <li><a class="leo-nav-item last" href="/contant.html">联系我</a></li>
+  
+</ul>
+
+      </div>
+          </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8"><div class="leo-category"><h1 class="leo-articel-title">apache负载均衡</h1>
+<div class="post">
+<p><br/>
+Apache负载均衡配置说明。</p>
+
+<h2>写在前面</h2>
+
+<p>公司的实施项目很多，11年整理的负载均衡配置文档，多次给大家邮件过去，还是有很多人要，这次整理出来贴到网上来。  </p>
+
+<h2>关键词</h2>
+
+<p>主服务器：master，用来提供服务的后端应用服务器<br>
+  热备份：Hot Standby 用来提供宕机时切换的备份服务器<br>
+  Apache：HttpServer 服务器<br>
+  Apache模块：apache服务器内部使用不同的模块扩展其功能  </p>
+
+<h2>负载均衡原理</h2>
+
+<ol>
+<li>将客户端的请求分发给后端部署的各个真实的服务器，达到分流均衡的目的。</li>
+<li>将请求全部分发给主服务器群，在主服务器群全部宕机后立即切换到备份服务器群。<br></li>
+</ol>
+
+<h2>负载均衡配置</h2>
+
+<h3>基本配置</h3>
+
+<p>以httpd-2.2.21-win32-x86-no_ssl为例，可自行去apache.org下载<br>
+  1. 安装Apache，在地址栏输入http://localhost回车后看到It’s Works表示安装成功。最近新版本apache的初始化界面很漂亮哦。</p>
+
+<ol>
+<li><p>打开conf目录下httpd.conf文件，启用如下三个模块。</p>
+
+<p>LoadModule proxy<em>module modules/mod</em>proxy.so
+LoadModule proxy<em>balancer</em>module modules/mod<em>proxy</em>balancer.so
+LoadModule proxy<em>http</em>module modules/mod<em>proxy</em>http.so  </p></li>
+</ol>
+
+<p>只要去掉前面的#即可。其中</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">mod_proxy提供代理服务器功能；
+mod_proxy_balancer提供负载均衡功能；
+mod_proxy_http让代理服务器能支持HTTP协议。
+</code></pre></div>
+<ol>
+<li><p>在httpd.conf文件最后添加如下配置：</p>
+
+<h1>以下为负载均衡配置</h1>
+
+<p>ProxyRequests Off<br>
+<Proxy balancer://x><br>
+    BalancerMember http://www.baidu.com
+    BalancerMember http://www.163.com
+</Proxy>
+ProxyPass /x balancer://x</p></li>
+</ol>
+
+<p>balancer://x  其中x为配置的负载均衡的唯一名称，可在后面引用；<br>
+  BalancerMember 实际服务器的地址，可配置多个，每个都会被指定分发到；<br>
+  ProxyPass /x 代理名称，值当前访问路径为/x均指定到负载均衡去处理；  </p>
+
+<h3>负载比例分配配置</h3>
+
+<p>需要给BalancerMember 加上一个参数loadfactor ，取值为1~100，默认为1，值越大分配到的请求数越多。</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">ProxyRequests Off  
+&lt;Proxy balancer://x&gt;  
+    BalancerMember http://www.baidu.com loadfactor=7 
+    BalancerMember http://www.163.com loadfactor=1
+&lt;/Proxy&gt;
+ProxyPass /x balancer://x  
+
+表示两个服务器已7:1的比例处理请求。
+</code></pre></div>
+<h3>负载算法配置</h3>
+
+<p>Apache负载均衡的算法有三种，系统默认采取安装请求次数均衡（1:1）。<br>
+  lbmethod=byrequests 按照请求次数均衡(默认)。<br>
+  lbmethod=bytraffic 按照流量均衡。<br>
+  lbmethod=bybusyness 按照繁忙程度均衡(总是分配给活跃请求数最少的服务器)   </p>
+
+<p>具体配置如下：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">ProxyRequests Off  
+&lt;Proxy balancer://x&gt;  
+    BalancerMember http://www.baidu.com loadfactor=7 
+    BalancerMember http://www.163.com loadfactor=1
+    ProxySet lbmethod=bytraffic
+&lt;/Proxy&gt;
+ProxyPass /x balancer://x
+</code></pre></div>
+<h3>热备份配置</h3>
+
+<p>留出备份服务器以提高系统的整体可靠性，具体见热备份章节。</p>
+
+<h3>热备份</h3>
+
+<p>需要给BalancerMember 加上一个status属性取值为+H<br>
+  具体配置如下：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">ProxyRequests Off  
+&lt;Proxy balancer://x&gt;  
+    BalancerMember http://www.baidu.com loadfactor=7 
+    BalancerMember http://www.163.com status=+H
+
+    ProxySet lbmethod=bytraffic
+&lt;/Proxy&gt;
+ProxyPass /x balancer://x
+</code></pre></div>
+<h3>配置多个负载均衡</h3>
+
+<p>上面一段可配置多个</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">#以下为负载均衡配置
+ProxyRequests Off  
+&lt;Proxy balancer://x&gt;  
+    BalancerMember http://www.baidu.com
+    BalancerMember http://www.163.com
+&lt;/Proxy&gt;
+ProxyPass /x balancer://x
+&lt;Proxy balancer://y&gt;  
+    BalancerMember http://www.google.com
+    BalancerMember http://www.163.com
+&lt;/Proxy&gt;
+ProxyPass /y balancer://y
+</code></pre></div>
+<p>示例：</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">访问http://localhost/x 会被均衡的转发到http://www.baidu.com,和http://www.163.com中。
+访问http://localhost/y会被均衡的转发到http://www.google.com,和http://www.163.com中。  
+</code></pre></div>
+</div>
+<p class="leo-protect">
+  作者：
+  <a href="/">leo</a>
+  　发布时间：2013年03月27日
+  <br>
+  原文：
+  <a href="/2013/03/27/apache-load-balancing">apache负载均衡</a>
+  <br>
+  标签： apache load balancing
+  <br/>
+  版权所有，转载时必须以链接形式注明作者和原出处并保留本声明。
+  <br>
+</p>
+<script type="text/javascript" src="/static/js/jquery-1.8.3.min.js"></script>
+<script type="text/javascript" src="/static/js/prettify.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $("pre").addClass("prettyprint linenums");
+    prettyPrint();
+  });
+</script>
+
+<!-- Duoshuo Comment BEGIN -->
+  <div class="ds-thread"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"jutleo"};
+  (function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = 'http://static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0] 
+    || document.getElementsByTagName('body')[0]).appendChild(ds);
+  })();
+  </script>
+<!-- Duoshuo Comment END --></div></div>
+          <div class="col-md-4">
+            <div class="list-group">
+              <a href="#" class="list-group-item list-group-item-success disabled">分类</a>
+              
+              <a href="/db/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>db </a>
+              
+              <a href="/server/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>server </a>
+              
+              <a href="/office/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>office </a>
+              
+              <a href="/javascript/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">6</span>javascript </a>
+              
+              <a href="/ireport/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">15</span>ireport </a>
+              
+              <a href="/blog/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>blog </a>
+              
+              <a href="/orm/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">2</span>orm </a>
+              
+              <a href="/technology/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">1</span>technology </a>
+              
+              <a href="/life/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">3</span>life </a>
+              
+              <a href="/spring/"  class="list-group-item" title="查看所有此分类文章列表"><span class="badge">5</span>spring </a>
+              
+            </div>
+            <div class="leo-article-category">
+              <iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=2975520964&verifier=eac976c7&dpc=1"></iframe>
+            </div>
+
+          </div>
+      </div>
+
+        </div>
+        
+      <div class="leo-foot">
+        <p>
+ Copyright &copy; 2010 - 2014 &nbsp;jutleo@gmail.com. 保留所有权利。
+</p>
+      </div>
+    </body>
+</html>

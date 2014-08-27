@@ -1,0 +1,5 @@
+<ul class="leo-nav">
+  {% for item in site.menuitems %}
+    <li><a class="{{item.class}}" href="{{item.url}}">{{item.name}}</a></li>
+  {% endfor %}
+</ul>
